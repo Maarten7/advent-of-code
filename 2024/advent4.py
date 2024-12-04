@@ -3,9 +3,11 @@ import os
 import re
 from pathlib import Path
 
+
 def count_xmas(letters: str):
     counts = re.findall("XMAS", letters)
     return len(counts)
+
 
 def main_1(file):
     total = 0
@@ -17,7 +19,7 @@ def main_1(file):
     total += sum([count_xmas("".join(inpu)) for inpu in input.T])
     total += sum([count_xmas("".join(inpu)) for inpu in input.T[:, ::-1]])
 
-    for offset in range(-input.shape[0], input.shape[0] ):
+    for offset in range(-input.shape[0], input.shape[0]):
         total += count_xmas("".join(np.diagonal(input, offset=offset)))
         total += count_xmas("".join(np.diagonal(input, offset=offset))[::-1])
         total += count_xmas("".join(np.diagonal(input[:, ::-1], offset=offset)))
@@ -33,21 +35,21 @@ def main_2(file):
 
     letters = set(["M", "S"])
 
-    for i, j in np.dstack(np.where(input == 'A')).reshape(-1, 2):
+    for i, j in np.dstack(np.where(input == "A")).reshape(-1, 2):
 
         if i in [0, input.shape[0] - 1] or j in [0, input.shape[1] - 1]:
             continue
 
-        lu = input[i-1, j-1]
-        ld = input[i-1, j+1]
-        ru = input[i+1, j-1]
-        rd = input[i+1, j+1]
-
+        lu = input[i - 1, j - 1]
+        ld = input[i - 1, j + 1]
+        ru = input[i + 1, j - 1]
+        rd = input[i + 1, j + 1]
 
         if set([lu, rd]) == letters and set([ld, ru]) == letters:
             total += 1
 
     return total
+
 
 if __name__ == "__main__":
     advent_day = Path(os.path.basename(__file__)).stem
