@@ -6,6 +6,7 @@ from pathlib import Path
 from math import floor
 from functools import cmp_to_key
 
+
 def make_rule_dict(ordering_rules):
     rule_dict = {}
     reverse_rule_dict = {}
@@ -14,6 +15,7 @@ def make_rule_dict(ordering_rules):
     for key, value in ordering_rules:
         reverse_rule_dict.setdefault(value, []).append(key)
     return rule_dict, reverse_rule_dict
+
 
 def in_order(line, reversed_rule_dict):
     if len(line) == 1:
