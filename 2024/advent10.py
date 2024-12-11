@@ -24,7 +24,7 @@ def find_paths(path, input):
     last_location = path[-1]
 
     if input[last_location] == 9:
-        yield path 
+        yield path
         return
 
     neighbours = get_neighbours(last_location, input)
@@ -32,7 +32,6 @@ def find_paths(path, input):
         if input[neighbour] - input[last_location] == 1:
             for _path in find_paths(path + [neighbour], input):
                 yield _path
-
 
 
 def main_1(file):

@@ -67,19 +67,18 @@ def main_2(file):
             if j < j_position:
                 continue
 
-            if count <= space:  
+            if count <= space:
                 for _ in range(count):
                     checksum += id * indices[j_position].pop(0)
                     spaces[i][2] -= 1
                 break
-            
+
         else:
             # NO SPACE FOUND
             # calculate part of checksum
             for _ in range(count):
                 checksum += id * indices[j].pop(0)
-    return checksum 
-
+    return checksum
 
 
 if __name__ == "__main__":
