@@ -1,3 +1,4 @@
+import timeit
 import numpy as np
 import os
 import re
@@ -38,9 +39,8 @@ def total_stones(stone, n=25):
     return len(stones), stones
 
 
-def go_deep(stones, depth):
+def go_deep(stones, depth, step_size):
 
-    step_size = 5
     total = 0
 
     if depth == step_size:
@@ -60,7 +60,7 @@ def go_deep(stones, depth):
 
             if result == None:
                 _, new_stones = total_stones(stone, step_size)
-                result = go_deep(new_stones, depth - step_size)
+                result = go_deep(new_stones, depth - step_size, step_size)
                 LOOKUP[(stone, depth)] = result
 
             total += result
@@ -77,8 +77,7 @@ def main_1(file):
 def main_2(file):
     input = [int(i) for i in open(file).readline().split()]
     stones = input
-    return go_deep(stones, 75)
-
+    return go_deep(stones, 75, 5)
 
 if __name__ == "__main__":
     advent_day = Path(os.path.basename(__file__)).stem
