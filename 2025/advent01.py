@@ -40,11 +40,11 @@ def main_2(file):
 
         if dial == 0 and dir == "L":
             score +=1
-        else:
-            score += abs(new_dial  // 100)
+
+        score += abs(new_dial  // 100)
 
         print(f"{new_dial = } {dial = } {score = } \n")
-    return score,
+    return score
 
 
 if __name__ == "__main__":
