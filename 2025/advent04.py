@@ -6,14 +6,13 @@ from pathlib import Path
 import itertools
 
 
-
 def main_1(file):
     input = np.array([[x for x in list(line)] for line in np.loadtxt(file, dtype=str)])
     a, b = np.where(input == "@")
-    ats = list(zip(a, b))
+    ats = set(zip(a, b))
     score = 0
     for i, j in ats:
-        neighbors = [ 
+        neighbors = [
             (i + 1, j + 1),
             (i + 1, j),
             (i + 1, j - 1),
@@ -29,14 +28,15 @@ def main_1(file):
             if neighbor in ats:
                 neighbor_count += 1
         if neighbor_count < 4:
-            score +=1 
-    return score,
+            score += 1
+    return score
+
 
 def find_and_remove(ats):
     score = 0
     to_be_removed = []
     for i, j in ats:
-        neighbors = [ 
+        neighbors = [
             (i + 1, j + 1),
             (i + 1, j),
             (i + 1, j - 1),
@@ -52,17 +52,18 @@ def find_and_remove(ats):
             if neighbor in ats:
                 neighbor_count += 1
         if neighbor_count < 4:
-            score +=1 
-            to_be_removed.append((i,j))
+            score += 1
+            to_be_removed.append((i, j))
 
     for remove in to_be_removed:
         ats.remove(remove)
-    return ats 
+    return ats
+
 
 def main_2(file):
     input = np.array([[x for x in list(line)] for line in np.loadtxt(file, dtype=str)])
     a, b = np.where(input == "@")
-    # change to list here
+    # change to list here to demonstrate slowness
     ats = set(zip(a, b))
 
     removed = None
@@ -77,7 +78,7 @@ def main_2(file):
 
 if __name__ == "__main__":
     TEST_1_ANS = 13
-    TEST_2_ANS = 43 
+    TEST_2_ANS = 43
     advent_day = Path(os.path.basename(__file__)).stem
     file = f"input_{advent_day}.txt"
     test_file = f"test_input_{advent_day}.txt"
