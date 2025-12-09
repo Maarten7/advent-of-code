@@ -1,23 +1,38 @@
 import numpy as np
 import os
-import re
-import math
 from pathlib import Path
-import itertools
 
 
 def get_outside(tiles):
     rx, ry = tiles.shape
 
-    print(tiles)
     for i in range(rx):
+
         if i % 1000 == 0:
             print(i, rx)
-        xs, = np.where(tiles[i] == 2)
+
+        (xs,) = np.where(tiles[i] == 2)
         if xs.size:
-            print(xs)
-    
-    return np.where(tiles == 1)
+            first_2 = xs[0]
+            last_2 = xs[-1] + 1
+            tiles[i, 0:first_2] = 1
+            tiles[i, last_2:-1] = 1
+
+    for j in range(ry):
+
+        if j % 1000 == 0:
+            print(j, ry)
+
+        (ys,) = np.where(tiles[:, j] == 2)
+        if ys.size:
+            first_2 = ys[0]
+            last_2 = ys[-1] + 1
+            tiles[0:first_2, j] = 1
+            tiles[last_2:-1, j] = 1
+
+    outside = set(list(zip(*np.where(tiles == 1))))
+
+    return outside
 
 
 def connect_dots(input):
@@ -28,23 +43,46 @@ def connect_dots(input):
         x, y = input[i]
         a, b = input[i + 1]
 
-        tiles[x, y] = 2 
+        tiles[x, y] = 2
         if a == x:
-            tiles[a, min(y, b): max(y, b)] = 2 
+            tiles[a, min(y, b) : max(y, b)] = 2
         if b == y:
-            tiles[min(x, a): max(x, a), b] = 2 
+            tiles[min(x, a) : max(x, a), b] = 2
 
     return tiles
 
 
 def get_areas(input):
-    areas = np.zeros((len(input), len(input)))
+    areas = np.empty((len(input), len(input)), dtype=int)
     for i, ci in enumerate(input):
         for j, cj in enumerate(input):
             if i > j:
                 continue
             areas[i, j] = (abs(ci[0] - cj[0]) + 1) * (abs(ci[1] - cj[1]) + 1)
     return areas
+
+
+def get_rectangle_perimeter(input, a, b):
+    ax, ay = input[a]
+    bx, by = input[b]
+
+    square = set()
+    square.update({(ax, j) for j in range(min(ay, by), max(ay, by))})
+    square.update({(i, ay) for i in range(min(ax, bx), max(ax, bx))})
+    square.update({(bx, j) for j in range(min(ay, by), max(ay, by))})
+    square.update({(i, by) for i in range(min(ax, bx), max(ax, bx))})
+
+    return square
+
+def get_rectangle_lines(input, a, b):
+    ax, ay = input[a]
+    bx, by = input[b]
+    return (
+        (ax, (min(ay, by), max(ay, by))),
+        (bx, (min(ay, by), max(ay, by))),
+        ((min(ax, bx), max(ax, bx)), ay),
+        ((min(ax, bx), max(a, ax)), by),
+        )
 
 
 def main_1(file):
@@ -61,44 +99,20 @@ def main_2(file):
     areas = get_areas(input)
     tiles = connect_dots(input)
     outside = get_outside(tiles)
-    outy, outx = outside
 
-    while True:
+    a, b = np.unravel_index(np.argmax(areas, axis=None), areas.shape)
+    square = get_rectangle_perimeter(input, a, b)
+    k = 0
+    while square & outside:
+        areas[a, b] = 0
         a, b = np.unravel_index(np.argmax(areas, axis=None), areas.shape)
+        square = get_rectangle_perimeter(input, a, b)
 
-        ai, aj = input[a]
-        bi, bj = input[b]
+        if k % 10:
+            print(k, int(0.5 * len(input) ** 2))
+        k += 1
 
-        has_outsider_on_border = False
-        for y in outy[np.where(outx == bj)]:
-            if min(ai, bi) < y < max(ai, bi):
-                has_outsider_on_border = True
-                break
-        for y in outy[np.where(outx == aj)]:
-            if has_outsider_on_border:
-                break
-            if min(ai, bi) < y < max(ai, bi):
-                has_outsider_on_border = True
-                break
-        for x in outx[np.where(outy == bi)]:
-            if has_outsider_on_border:
-                break
-            if min(aj, bj) < x < max(aj, bj):
-                has_outsider_on_border = True
-                break
-        for x in outx[np.where(outy == ai)]:
-            if has_outsider_on_border:
-                break
-            if min(aj, bj) < x < max(aj, bj):
-                has_outsider_on_border = True
-                break
-
-        if has_outsider_on_border:
-            areas[a, b] = 0
-            continue
-
-        if not has_outsider_on_border:
-            return areas[a, b]
+    return areas[a, b]
 
 
 if __name__ == "__main__":
