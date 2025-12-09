@@ -5,46 +5,37 @@ import math
 from pathlib import Path
 import itertools
 
+
 def get_outside(tiles):
     rx, ry = tiles.shape
+
+    print(tiles)
     for i in range(rx):
-        tiles[i,0: np.where(tiles[i] == "X")[0]] = ","
-        while j < ry and tiles[i, j] != "X":
-            tiles[i, j] = ","
-            j += 1
-        j = 0
-        while j < ry and tiles[i, -j] != "X":
-            tiles[i, -j] = ","
-            j += 1
+        if i % 1000 == 0:
+            print(i, rx)
+        xs, = np.where(tiles[i] == 2)
+        if xs.size:
+            print(xs)
     
-    for j in range(ry):
-        i = 0
-        while i < rx and tiles[i, j] != "X":
-            tiles[i, j] = ","
-            i += 1
-        i = 0
-        while i < rx and tiles[-i, j] != "X":
-            tiles[-i, j] = ","
-            i += 1
-    return np.where(tiles == ",")
+    return np.where(tiles == 1)
+
 
 def connect_dots(input):
     xs, ys = list(zip(*input))
-    tiles = np.full((max(xs) + 1, max(ys) + 1), ".")
+    tiles = np.zeros((max(xs) + 1, max(ys) + 1))
 
     for i in range(-1, len(input) - 1):
         x, y = input[i]
         a, b = input[i + 1]
 
-        tiles[x, y] = "X"
+        tiles[x, y] = 2 
         if a == x:
-            for jj in range(min(y, b), max(y, b)):
-                tiles[a, jj] = "X"
+            tiles[a, min(y, b): max(y, b)] = 2 
         if b == y:
-            for ii in range(min(x, a), max(x, a)):
-                tiles[ii, b] = "X"
-    
+            tiles[min(x, a): max(x, a), b] = 2 
+
     return tiles
+
 
 def get_areas(input):
     areas = np.zeros((len(input), len(input)))
@@ -54,6 +45,7 @@ def get_areas(input):
                 continue
             areas[i, j] = (abs(ci[0] - cj[0]) + 1) * (abs(ci[1] - cj[1]) + 1)
     return areas
+
 
 def main_1(file):
     input = [x.split(",") for x in np.loadtxt(file, dtype=str)]
@@ -78,28 +70,31 @@ def main_2(file):
         bi, bj = input[b]
 
         has_outsider_on_border = False
-        for y in outy[np.where(outx==bj)]:
+        for y in outy[np.where(outx == bj)]:
             if min(ai, bi) < y < max(ai, bi):
                 has_outsider_on_border = True
                 break
-        for y in outy[np.where(outx==aj)]:
-            if has_outsider_on_border: break
+        for y in outy[np.where(outx == aj)]:
+            if has_outsider_on_border:
+                break
             if min(ai, bi) < y < max(ai, bi):
                 has_outsider_on_border = True
                 break
-        for x in outx[np.where(outy==bi)]:
-            if has_outsider_on_border: break
+        for x in outx[np.where(outy == bi)]:
+            if has_outsider_on_border:
+                break
             if min(aj, bj) < x < max(aj, bj):
                 has_outsider_on_border = True
                 break
-        for x in outx[np.where(outy==ai)]:
-            if has_outsider_on_border: break
+        for x in outx[np.where(outy == ai)]:
+            if has_outsider_on_border:
+                break
             if min(aj, bj) < x < max(aj, bj):
                 has_outsider_on_border = True
                 break
 
-        if has_outsider_on_border: 
-            areas[a, b] = 0 
+        if has_outsider_on_border:
+            areas[a, b] = 0
             continue
 
         if not has_outsider_on_border:
