@@ -2,6 +2,7 @@ import numpy as np
 import os
 from pathlib import Path
 
+
 def get_rectangle_lines(input, a, b):
     ax, ay = input[a]
     bx, by = input[b]
@@ -10,7 +11,8 @@ def get_rectangle_lines(input, a, b):
         (bx, (min(ay, by), max(ay, by))),
         ((min(ax, bx), max(ax, bx)), ay),
         ((min(ax, bx), max(a, ax)), by),
-        )
+    )
+
 
 def lines_clean(lines, tiles):
 
@@ -18,18 +20,18 @@ def lines_clean(lines, tiles):
 
     for x_line in [x_line_1, x_line_2]:
         x_value, (y_low, y_high) = x_line
-        ys, = np.where(tiles[x_value] == 2)
+        (ys,) = np.where(tiles[x_value] == 2)
         if ys.size:
             first_2 = ys[0]
             last_2 = ys[-1]
             if y_low < first_2:
                 return False
-            if last_2 < y_high: 
+            if last_2 < y_high:
                 return False
         else:
             return False
         for y_value in range(y_low, y_high + 1):
-            xs, = np.where(tiles[:, y_value] == 2)
+            (xs,) = np.where(tiles[:, y_value] == 2)
             if xs.size:
                 first_2 = xs[0]
                 last_2 = xs[-1]
@@ -37,21 +39,21 @@ def lines_clean(lines, tiles):
                     return False
             else:
                 return False
-    
+
     for y_line in [y_line_1, y_line_2]:
         (x_low, x_high), y_value = y_line
-        xs, = np.where(tiles[:, y_value] == 2)
+        (xs,) = np.where(tiles[:, y_value] == 2)
         if xs.size:
             first_2 = xs[0]
             last_2 = xs[-1]
             if x_low < first_2:
                 return False
-            if last_2 < x_high: 
+            if last_2 < x_high:
                 return False
         else:
             return False
-        for x_value in range(x_low, x_high+1):
-            ys, = np.where(tiles[x_value] == 2)
+        for x_value in range(x_low, x_high + 1):
+            (ys,) = np.where(tiles[x_value] == 2)
             if ys.size:
                 first_2 = ys[0]
                 last_2 = ys[-1]
@@ -60,6 +62,7 @@ def lines_clean(lines, tiles):
             else:
                 return False
     return True
+
 
 def connect_dots(input):
     xs, ys = list(zip(*input))
@@ -77,6 +80,19 @@ def connect_dots(input):
 
     return tiles
 
+def fill_shape(tiles):
+    ri, rj = tiles.shape
+    for i in range(ri):
+        inside = False
+        for j in range(rj):
+            if tiles[i, j] == 2:
+                inside = not inside 
+            if tiles[i, j] == 0:
+                if inside:
+                    tiles[i, j] = 2
+                
+    return tiles 
+
 
 def get_areas(input):
     areas = np.empty((len(input), len(input)), dtype=int)
@@ -86,20 +102,6 @@ def get_areas(input):
                 continue
             areas[i, j] = (abs(ci[0] - cj[0]) + 1) * (abs(ci[1] - cj[1]) + 1)
     return areas
-
-
-def get_rectangle_perimeter(input, a, b):
-    ax, ay = input[a]
-    bx, by = input[b]
-
-    square = set()
-    square.update({(ax, j) for j in range(min(ay, by), max(ay, by))})
-    square.update({(i, ay) for i in range(min(ax, bx), max(ax, bx))})
-    square.update({(bx, j) for j in range(min(ay, by), max(ay, by))})
-    square.update({(i, by) for i in range(min(ax, bx), max(ax, bx))})
-
-    return square
-
 
 
 def main_1(file):
@@ -115,6 +117,8 @@ def main_2(file):
     input = [(int(a), int(b)) for a, b in input]
     areas = get_areas(input)
     tiles = connect_dots(input)
+    tiles = fill_shape(tiles)
+    print(tiles)
 
     a, b = np.unravel_index(np.argmax(areas, axis=None), areas.shape)
     four_lines = get_rectangle_lines(input, a, b)
@@ -123,6 +127,7 @@ def main_2(file):
         areas[a, b] = 0
         a, b = np.unravel_index(np.argmax(areas, axis=None), areas.shape)
         four_lines = get_rectangle_lines(input, a, b)
+
 
     return areas[a, b]
 
