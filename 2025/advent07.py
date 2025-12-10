@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 import itertools
 
+
 def run_tachyon(input):
     for i in range(1, len(input)):
         for j in range(len(input[0])):
@@ -34,6 +35,7 @@ def run_tachyon(input):
                     input[i, j] = "|"
     return input
 
+
 def run_int_tachyon(input):
     for i in range(1, len(input)):
         for j in range(len(input[0])):
@@ -45,25 +47,26 @@ def run_int_tachyon(input):
                 next = input[i, j + 1]
                 diag_forw = input[i - 1, j + 1]
             except IndexError:
-                next = 0 
+                next = 0
                 diag_forw = 0
             try:
                 prev = input[i, j - 1]
                 diag_back = input[i - 1, j - 1]
             except IndexError:
-                prev = 0 
+                prev = 0
                 diag_back = 0
 
             if pos == 0:
-                if (above == -2):
-                    input[i, j] += 1 
+                if above == -2:
+                    input[i, j] += 1
                 if above > 0:
                     input[i, j] = above
-                if (next == -1 and diag_forw > 0):
-                    input[i, j] += diag_forw 
-                if (prev == -1 and diag_back > 0):
-                    input[i, j] += diag_back 
+                if next == -1 and diag_forw > 0:
+                    input[i, j] += diag_forw
+                if prev == -1 and diag_back > 0:
+                    input[i, j] += diag_back
     return input
+
 
 def count_and_remove_splits(input):
     score = 0
@@ -75,24 +78,27 @@ def count_and_remove_splits(input):
                 if above == "|":
                     score += 1
                 else:
-                    input[i, j] = '.'
-            
+                    input[i, j] = "."
+
     return score, input
+
 
 def to_ints(input):
     mapje = {".": 0, "|": 1, "^": -1, "S": -2}
     new_tree = np.zeros((len(input), len(input[0])))
     for i in range(0, len(input)):
         for j in range(len(input[0])):
-            new_tree[i,j] = mapje[input[i,j]]
+            new_tree[i, j] = mapje[input[i, j]]
 
     return new_tree
+
 
 def main_1(file):
     input = np.array([list(x) for x in np.loadtxt(file, dtype=str)])
     input = run_tachyon(input)
     count, input = count_and_remove_splits(input)
     return count
+
 
 def main_2(file):
     input = np.array([list(x) for x in np.loadtxt(file, dtype=str)])
